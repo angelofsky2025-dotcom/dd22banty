@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>체육대회 반티 신청</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #111; font-size: 16px; }
+    .wrap { max-width: 540px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+    .header-icon { width: 44px; height: 44px; border-radius: 50%; background: #1D9E75; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .header h1 { font-size: 18px; font-weight: 600; }
+    .header p { font-size: 13px; color: #666; margin-top: 2px; }
+    .card { background: #fff; border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; }
+    .card-title { font-size: 15px; font-weight: 600; }
+    .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: #E1F5EE; color: #0F6E56; font-weight: 600; }
+    .badge-x { background: #FEF3C7; color: #92400E; }
+    .field { margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 500; }
+    .field input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; transition: border-color 0.15s; background: #fff; }
+    .field input[type="text"]:focus { border-color: #1D9E75; }
+    .opts { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ob { flex: 1; min-width: 56px; padding: 9px 8px; font-size: 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; background: #fff; color: #333; cursor: pointer; text-align: center; font-weight: 500; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .ob:active { transform: scale(0.96); }
+    .ob.on { background: #1D9E75; color: #fff; border-color: #1D9E75; }
+    .divider { border: none; border-top: 1px solid #f0f0f0; margin: 0.85rem 0; }
+    .tog-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+    .tog-label .name { font-size: 14px; font-weight: 600; color: #111; }
+    .tog-label .desc { font-size: 12px; color: #888; margin-top: 2px; }
+    .sw { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+    .sw input { opacity: 0; width: 0; height: 0; }
+    .sl { position: absolute; inset: 0; background: #ddd; border-radius: 26px; cursor: pointer; transition: background 0.2s; }
+    .sl:before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    input:checked + .sl { background: #1D9E75; }
+    input:checked + .sl:before { transform: translateX(20px); }
+    .xi { margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px dashed #e8e8e8; }
+    .err { font-size: 12px; color: #e53e3e; margin-top: 5px; display: none; }
+    .sum-box { background: #fff; border-radius: 14px; padding: 1.1rem 1.25rem; margin-top: 0.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .sr { display: flex; justify-content: space-between; font-size: 14px; padding: 5px 0; color: #666; }
+    .st { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #111; border-top: 1px solid #eee; margin-top: 10px; padding-top: 12px; }
+    .st span:last-child { color: #1D9E75; }
+    .btn-submit { width: 100%; padding: 15px; font-size: 16px; font-weight: 700; margin-top: 1.25rem; background: #1D9E75; color: #fff; border: none; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.15s; }
+    .btn-submit:active { background: #0F6E56; transform: scale(0.98); }
+    .btn-reset { width: 100%; padding: 13px; font-size: 15px; font-weight: 600; margin-top: 10px; background: #fff; color: #333; border: 1.5px solid #e0e0e0; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .btn-reset:active { background: #f5f5f5; }
+
+    #result { display: none; }
+    .result-header { text-align: center; padding: 1.5rem 0 1rem; }
+    .check-circle { width: 64px; height: 64px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .result-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .result-header p { font-size: 14px; color: #666; }
+    .result-card { background: #fff; border-radius: 14px; overflow: hidden; margin-top: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .result-sec { padding: 1rem 1.25rem; border-bottom: 1px solid #f0f0f0; }
+    .result-sec:last-child { border-bottom: none; }
+    .result-sec-title { font-size: 11px; font-weight: 700; color: #999; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+    .result-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+    .rl { font-size: 13px; color: #666; }
+    .rv { font-size: 14px; font-weight: 600; color: #111; }
+    .chip { display: inline-block; font-size: 12px; padding: 3px 10px; border-radius: 20px; background: #FEF3C7; color: #92400E; font-weight: 600; }
+    .result-total { padding: 1rem 1.25rem; background: #f9f9f9; display: flex; justify-content: space-between; align-items: center; }
+    .result-total span:first-child { font-size: 14px; color: #666; }
+    .result-total span:last-child { font-size: 22px; font-weight: 700; color: #1D9E75; }
+    .saving-msg { text-align: center; font-size: 13px; color: #888; margin-top: 12px; }
+    .save-ok { color: #1D9E75; font-weight: 600; }
+    .save-fail { color: #e53e3e; font-weight: 600; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 3h-8l-2 4h12l-2-4z"/></svg>
+    </div>
+    <div>
+      <h1>체육대회 반티 신청</h1>
+      <p>신청서를 작성해 주세요</p>
+    </div>
+  </div>
+
+  <div id="form-body">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:0.85rem;">기본 정보</div>
+      <div class="field">
+        <label>이름 <span style="color:#e53e3e">*</span></label>
+        <input type="text" id="realname" placeholder="실명을 입력해 주세요" />
+        <div class="err" id="err-realname">이름을 입력해 주세요.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">상의</span>
+        <span class="badge">12,000원</span>
+      </div>
+      <div class="field">
+        <label>소매 길이</label>
+        <div class="opts" id="g-sleeve">
+          <div class="ob" data-g="sleeve" data-v="반팔" onclick="pick(this)">반팔</div>
+          <div class="ob" data-g="sleeve" data-v="긴팔" onclick="pick(this)">긴팔</div>
+        </div>
+        <div class="err" id="err-sleeve">소매 길이를 선택해 주세요.</div>
+      </div>
+      <div class="field">
+        <label>사이즈</label>
+        <div class="opts" id="g-size">
+          <div class="ob" data-g="size" data-v="90" onclick="pick(this)">90</div>
+          <div class="ob" data-g="size" data-v="95" onclick="pick(this)">95</div>
+          <div class="ob" data-g="size" data-v="100" onclick="pick(this)">100</div>
+          <div class="ob" data-g="size" data-v="105" onclick="pick(this)">105</div>
+          <div class="ob" data-g="size" data-v="110" onclick="pick(this)">110</div>
+          <div class="ob" data-g="size" data-v="115" onclick="pick(this)">115</div>
+        </div>
+        <div class="err" id="err-size">사이즈를 선택해 주세요.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">하의</span>
+        <span class="badge">5,000원</span>
+      </div>
+      <div class="tog-row">
+        <div class="tog-label">
+          <div class="name">하의 신청</div>
+          <div class="desc">기본 5,000원</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="tog-pants" checked onchange="calcTotal()"><span class="sl"></span></label>
+      </div>
+      <div id="pants-sz" style="margin-top:0.85rem;">
+        <hr class="divider">
+        <div class="field" style="margin-bottom:0;">
+          <label>하의 사이즈</label>
+          <div class="opts" id="g-psz">
+            <div class="ob" data-g="psz" data-v="90" onclick="pick(this)">90</div>
+            <div class="ob" data-g="psz" data-v="95" onclick="pick(this)">95</div>
+            <div class="ob" data-g="psz" data-v="100" onclick="pick(this)">100</div>
+            <div class="ob" data-g="psz" data-v="105" onclick="pick(this)">105</div>
+            <div class="ob" data-g="psz" data-v="110" onclick="pick(this)">110</div>
+            <div class="ob" data-g="psz" data-v="115" onclick="pick(this)">115</div>
+          </div>
+          <div class="err" id="err-psz">하의 사이즈를 선택해 주세요.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:600;margin-bottom:0.85rem;">추가 옵션 <span style="font-size:12px;font-weight:400;color:#888;">선택 사항</span></div>
+      <div class="tog-row">
+        <div class="tog-label">
+          <div class="name">별명 인쇄 <span class="badge badge-x">+2,000원</span></div>
+          <div class="desc">원하시는 별명을 넣어드려요</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="tog-nick" onchange="togExtra('nick')"><span class="sl"></span></label>
+      </div>
+      <div class="xi" id="xi-nick" style="display:none;">
+        <div class="field" style="margin-bottom:0;">
+          <label>별명</label>
+          <input type="text" id="nickname" placeholder="예: 번개맨" maxlength="10" />
+          <div class="err" id="err-nick">별명을 입력해 주세요.</div>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="tog-row">
+        <div class="tog-label">
+          <div class="name">번호 인쇄 <span class="badge badge-x">+3,000원</span></div>
+          <div class="desc">등번호를 넣어드려요</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="tog-num" onchange="togExtra('num')"><span class="sl"></span></label>
+      </div>
+      <div class="xi" id="xi-num" style="display:none;">
+        <div class="field" style="margin-bottom:0;">
+          <label>번호</label>
+          <input type="text" id="number" placeholder="예: 7" maxlength="3" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+          <div class="err" id="err-num">번호를 입력해 주세요.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sum-box">
+      <div class="sr"><span>상의</span><span>12,000원</span></div>
+      <div class="sr" id="sr-pants"><span>하의</span><span>5,000원</span></div>
+      <div class="sr" id="sr-nick" style="display:none;"><span>별명 인쇄</span><span>2,000원</span></div>
+      <div class="sr" id="sr-num" style="display:none;"><span>번호 인쇄</span><span>3,000원</span></div>
+      <div class="st"><span>합계</span><span id="total-price">17,000원</span></div>
+    </div>
+
+    <button class="btn-submit" onclick="doSubmit()">신청하기</button>
+  </div>
+
+  <div id="result">
+    <div class="result-header">
+      <div class="check-circle">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>신청 완료!</h2>
+      <p id="res-name"></p>
+    </div>
+    <div class="result-card">
+      <div class="result-sec">
+        <div class="result-sec-title">기본 정보</div>
+        <div class="result-row"><span class="rl">이름</span><span class="rv" id="res-realname"></span></div>
+      </div>
+      <div class="result-sec">
+        <div class="result-sec-title">상의</div>
+        <div class="result-row"><span class="rl">소매</span><span class="rv" id="res-sleeve"></span></div>
+        <div class="result-row"><span class="rl">사이즈</span><span class="rv" id="res-size"></span></div>
+      </div>
+      <div class="result-sec" id="res-pants-sec">
+        <div class="result-sec-title">하의</div>
+        <div class="result-row"><span class="rl">사이즈</span><span class="rv" id="res-psz"></span></div>
+      </div>
+      <div class="result-sec" id="res-extra-sec" style="display:none;">
+        <div class="result-sec-title">추가 옵션</div>
+        <div class="result-row" id="res-nick-row" style="display:none;"><span class="rl">별명 인쇄</span><span class="rv"><span class="chip" id="res-nick"></span></span></div>
+        <div class="result-row" id="res-num-row" style="display:none;"><span class="rl">번호 인쇄</span><span class="rv"><span class="chip" id="res-num"></span></span></div>
+      </div>
+      <div class="result-total">
+        <span>최종 결제 금액</span>
+        <span id="res-total"></span>
+      </div>
+    </div>
+    <div class="saving-msg" id="saving-msg"></div>
+    <button class="btn-reset" onclick="doReset()">↩ 다시 입력하기</button>
+  </div>
+</div>
+
+<script>
+  var SHEET_URL = "https://script.google.com/macros/s/AKfycby0gHNmIhixVF1bUb1AquGG-6qatjkwPFFGpqbg4YsFosGf6b_VnuBl6iwzH1xNravtBA/exec";
+  var PRICE = { top: 12000, pants: 5000, nick: 2000, num: 3000 };
+  var S = { sleeve: null, size: null, psz: null };
+
+  function pick(el) {
+    var g = el.dataset.g, v = el.dataset.v;
+    S[g] = v;
+    document.querySelectorAll('[data-g="' + g + '"]').forEach(function(b){ b.classList.remove('on'); });
+    el.classList.add('on');
+    calcTotal();
+  }
+
+  function togExtra(t) {
+    var on = document.getElementById('tog-' + t).checked;
+    document.getElementById('xi-' + t).style.display = on ? 'block' : 'none';
+    document.getElementById('sr-' + t).style.display = on ? 'flex' : 'none';
+    if (!on) document.getElementById('err-' + t).style.display = 'none';
+    calcTotal();
+  }
+
+  function calcTotal() {
+    var pantsOn = document.getElementById('tog-pants').checked;
+    document.getElementById('pants-sz').style.display = pantsOn ? 'block' : 'none';
+    document.getElementById('sr-pants').style.display = pantsOn ? 'flex' : 'none';
+    var t = PRICE.top + (pantsOn ? PRICE.pants : 0)
+      + (document.getElementById('tog-nick').checked ? PRICE.nick : 0)
+      + (document.getElementById('tog-num').checked ? PRICE.num : 0);
+    document.getElementById('total-price').textContent = t.toLocaleString() + '원';
+  }
+
+  function doSubmit() {
+    var ok = true;
+    function need(id, eid) {
+      if (!document.getElementById(id).value.trim()) { document.getElementById(eid).style.display = 'block'; ok = false; }
+      else document.getElementById(eid).style.display = 'none';
+    }
+    need('realname', 'err-realname');
+    if (!S.sleeve) { document.getElementById('err-sleeve').style.display = 'block'; ok = false; } else document.getElementById('err-sleeve').style.display = 'none';
+    if (!S.size)   { document.getElementById('err-size').style.display = 'block';   ok = false; } else document.getElementById('err-size').style.display = 'none';
+    var pantsOn = document.getElementById('tog-pants').checked;
+    if (pantsOn && !S.psz) { document.getElementById('err-psz').style.display = 'block'; ok = false; } else document.getElementById('err-psz').style.display = 'none';
+    var nickOn = document.getElementById('tog-nick').checked;
+    var numOn  = document.getElementById('tog-num').checked;
+    if (nickOn) need('nickname', 'err-nick');
+    if (numOn)  need('number',   'err-num');
+    if (!ok) return;
+
+    var name  = document.getElementById('realname').value.trim();
+    var total = PRICE.top + (pantsOn ? PRICE.pants : 0) + (nickOn ? PRICE.nick : 0) + (numOn ? PRICE.num : 0);
+
+    document.getElementById('res-name').textContent     = name + '님의 신청 내역입니다.';
+    document.getElementById('res-realname').textContent = name;
+    document.getElementById('res-sleeve').textContent   = S.sleeve;
+    document.getElementById('res-size').textContent     = S.size;
+
+    if (pantsOn) { document.getElementById('res-psz').textContent = S.psz; document.getElementById('res-pants-sec').style.display = 'block'; }
+    else document.getElementById('res-pants-sec').style.display = 'none';
+
+    if (nickOn) { document.getElementById('res-nick').textContent = document.getElementById('nickname').value.trim(); document.getElementById('res-nick-row').style.display = 'flex'; }
+    else document.getElementById('res-nick-row').style.display = 'none';
+    if (numOn)  { document.getElementById('res-num').textContent  = document.getElementById('number').value.trim() + '번'; document.getElementById('res-num-row').style.display = 'flex'; }
+    else document.getElementById('res-num-row').style.display = 'none';
+    document.getElementById('res-extra-sec').style.display = (nickOn || numOn) ? 'block' : 'none';
+    document.getElementById('res-total').textContent = total.toLocaleString() + '원';
+
+    document.getElementById('form-body').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    window.scrollTo(0, 0);
+
+    var savingEl = document.getElementById('saving-msg');
+    savingEl.textContent = '구글 시트에 저장 중...';
+    savingEl.className = 'saving-msg';
+
+    fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name, sleeve: S.sleeve, topSize: S.size,
+        pants: pantsOn ? '신청' : '미신청', pantsSize: pantsOn ? S.psz : null,
+        nickname: nickOn ? document.getElementById('nickname').value.trim() : null,
+        number:   numOn  ? document.getElementById('number').value.trim()   : null,
+        total: total
+      })
+    }).then(function() {
+      savingEl.innerHTML = '✓ 구글 시트에 저장되었습니다.';
+      savingEl.className = 'saving-msg save-ok';
+    }).catch(function() {
+      savingEl.innerHTML = '⚠ 저장 중 오류가 발생했습니다.';
+      savingEl.className = 'saving-msg save-fail';
+    });
+  }
+
+  function doReset() {
+    document.getElementById('realname').value  = '';
+    document.getElementById('nickname').value  = '';
+    document.getElementById('number').value    = '';
+    S = { sleeve: null, size: null, psz: null };
+    document.querySelectorAll('.ob').forEach(function(b){ b.classList.remove('on'); });
+    document.getElementById('tog-pants').checked = true;
+    document.getElementById('tog-nick').checked  = false;
+    document.getElementById('tog-num').checked   = false;
+    document.getElementById('xi-nick').style.display = 'none';
+    document.getElementById('xi-num').style.display  = 'none';
+    document.getElementById('sr-nick').style.display = 'none';
+    document.getElementById('sr-num').style.display  = 'none';
+    document.getElementById('pants-sz').style.display = 'block';
+    document.querySelectorAll('.err').forEach(function(e){ e.style.display = 'none'; });
+    document.getElementById('saving-msg').textContent = '';
+    calcTotal();
+    document.getElementById('result').style.display    = 'none';
+    document.getElementById('form-body').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  calcTotal();
+</script>
+</body>
+</html>
